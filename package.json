@@ -20,6 +20,7 @@
     "react-test-renderer": "^15.6.1"
   },
   "dependencies": {
+    "@turf/turf": "^4.7.3",
     "gh-pages": "^1.0.0",
     "mapbox-gl": "^0.40.0",
     "react": "^15.6.1",
