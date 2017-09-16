@@ -1,7 +1,8 @@
 {
-  "name": "app",
+  "name": "horseshoe-trail-map",
+  "homepage": "https://brygrill.github.io/horseshoe-trail-map",
   "version": "0.1.0",
-  "private": true,
+  "private": false,
   "devDependencies": {
     "babel-eslint": "^8.0.0",
     "babel-plugin-transform-class-properties": "^6.24.1",
@@ -19,6 +20,7 @@
     "react-test-renderer": "^15.6.1"
   },
   "dependencies": {
+    "gh-pages": "^1.0.0",
     "mapbox-gl": "^0.40.0",
     "react": "^15.6.1",
     "react-dom": "^15.6.1",
@@ -28,6 +30,8 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test --env=jsdom",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d build",
     "pretty": "prettier --single-quote --trailing-comma all --write './src/**/*.js'"
   }
 }
