@@ -72,10 +72,19 @@ export default class App extends Component {
 
   trailOnClick = map => {
     map.on('click', 'trail', pt => {
-      new mapboxgl.Popup()
-        .setLngLat(pt.lngLat)
-        .setHTML('Horseshoe Trail')
-        .addTo(map);
+      console.log(pt);
+      // new mapboxgl.Popup()
+      //   .setLngLat(pt.lngLat)
+      //   .setHTML('Horseshoe Trail')
+      //   .addTo(map);
+    });
+    map.on('mouseenter', 'trail', () => {
+      map.getCanvas().style.cursor = 'pointer';
+    });
+
+    // Change it back to a pointer when it leaves.
+    map.on('mouseleave', 'trail', () => {
+      map.getCanvas().style.cursor = '';
     });
   };
 
