@@ -48,6 +48,7 @@
     ],
     "react/forbid-prop-types": "off",
     "arrow-parens": "off",
-    "react/prefer-stateless-function": "off"
+    "react/prefer-stateless-function": "off",
+    "linebreak-style":"off"
   }
 }
