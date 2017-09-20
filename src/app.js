@@ -15,6 +15,7 @@ export default class App extends Component {
     listenForPt2: false,
     segment: null,
     segmentLength: 0,
+    layerIDs: ['point1', 'point2', 'segment']
   };
 
   componentDidMount() {
@@ -36,7 +37,60 @@ export default class App extends Component {
     this.mapOnDblClick(map);
 
     // Show popup on trail click
-    this.trailOnClick(map);
+    this.trailOnHover(map);
+  }
+
+  setTrailPopup = pt => {
+    const popupMsg = this.state.listenForPt2 ? 'Double click to add ending point' : 'Double click to add starting point'
+    return new mapboxgl.Popup({ closeButton: false, offset: 10 })
+      .setLngLat(pt.lngLat)
+      .setHTML(popupMsg);
+  };
+
+  addPointToMap = (map, lng, lat, id) => {
+    map.addLayer({
+      id,
+      type: 'symbol',
+      source: {
+        type: 'geojson',
+        data: {
+          type: 'FeatureCollection',
+          features: [
+            {
+              type: 'Feature',
+              geometry: {
+                type: 'Point',
+                coordinates: [lng, lat],
+              },
+            },
+          ],
+        },
+      },
+      layout: {
+        'icon-image': 'marker-15',
+        'icon-allow-overlap': true,
+      },
+    });
+  }
+
+  addSegmentToMap = (map, data, id) => {
+    map.addLayer({
+      id,
+      type: 'line',
+      source: {
+        type: 'geojson',
+        data,
+      },
+      layout: {
+        'line-join': 'round',
+        'line-cap': 'round',
+      },
+      paint: {
+        'line-color': '#fff',
+        'line-width': 3,
+        'line-dasharray': [2, 2]
+      },
+    });
   }
 
   measureSegment = (startCoords, endCoords, feature) => {
@@ -53,38 +107,50 @@ export default class App extends Component {
       // listen for two double clicks
       if (!this.state.listenForPt2) {
         this.setState({ pt1: pt.lngLat, listenForPt2: true });
+        // if there is a segment on map
+        // remove it before adding a new starting point
+        if (this.state.segment) {
+          this.state.layerIDs.map(item => {
+            map.removeSource(item);
+            map.removeLayer(item);
+            return null;
+          })
+        }
+        this.addPointToMap(map, pt.lngLat.lng, pt.lngLat.lat, this.state.layerIDs[0]);
       } else {
         this.setState({ pt2: pt.lngLat, listenForPt2: false });
+        this.addPointToMap(map, pt.lngLat.lng, pt.lngLat.lat, this.state.layerIDs[1]);
       }
 
       // if we have both points calc the segment length
       if (this.state.pt1 && this.state.pt2) {
+        // get segment
         this.measureSegment(
           [this.state.pt1.lng, this.state.pt1.lat],
           [this.state.pt2.lng, this.state.pt2.lat],
           trail.features[0],
         );
         console.log(this.state);
+        // add segment to map
+        this.addSegmentToMap(map, this.state.segment, this.state.layerIDs[2]);
+        // reset points to listen for next doubleclick
         this.setState({ pt1: null, pt2: null, listenForPt2: false });
       }
     });
   };
 
-  trailOnClick = map => {
-    map.on('click', 'trail', pt => {
-      console.log(pt);
-      // new mapboxgl.Popup()
-      //   .setLngLat(pt.lngLat)
-      //   .setHTML('Horseshoe Trail')
-      //   .addTo(map);
-    });
-    map.on('mouseenter', 'trail', () => {
-      map.getCanvas().style.cursor = 'pointer';
+  trailOnHover = map => {
+    let hoverPopup = null;
+    map.on('mouseenter', 'trail', pt => {
+      map.getCanvas().style.cursor = 'pointer'; // eslint-disable-line no-param-reassign
+      hoverPopup = this.setTrailPopup(pt);
+      hoverPopup.addTo(map);
     });
 
     // Change it back to a pointer when it leaves.
     map.on('mouseleave', 'trail', () => {
-      map.getCanvas().style.cursor = '';
+      map.getCanvas().style.cursor = ''; // eslint-disable-line no-param-reassign
+      hoverPopup.remove();
     });
   };
 
@@ -99,6 +165,14 @@ export default class App extends Component {
         id: 'trail',
         type: 'line',
         source: 'trail',
+        layout: {
+          'line-join': 'round',
+          'line-cap': 'round',
+        },
+        paint: {
+          'line-color': '#1E824C',
+          'line-width': 4,
+        },
       });
     });
   };
