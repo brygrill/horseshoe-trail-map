@@ -22,6 +22,8 @@
   "dependencies": {
     "@turf/turf": "^4.7.3",
     "gh-pages": "^1.0.0",
+    "grommet": "^1.7.0",
+    "grommet-css": "^1.6.0",
     "mapbox-gl": "^0.40.0",
     "react": "^15.6.1",
     "react-dom": "^15.6.1",
